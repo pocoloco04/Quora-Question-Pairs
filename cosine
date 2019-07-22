@@ -1,0 +1,63 @@
+
+import pandas as pd
+import numpy as np
+from gensim.models import KeyedVectors
+import re
+from nltk.corpus import stopwords
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+from keras.models import Model
+from keras.layers import Input, Embedding, LSTM, Lambda
+import keras.backend as K
+from keras.optimizers import Adadelta
+  
+
+
+
+train_df = pd.read_csv("/home/utkarsh/Desktop/train.csv")
+test_df = pd.read_csv("/home/utkarsh/Desktop/test.csv")
+stops = set(stopwords.words('english'))
+
+
+ import re
+ from nltk.stem.porter import PorterStemmer
+ corpus = []
+for i in range(0 , 22):
+  question1 = re.sub('[^a-zA-Z]',' ',train_df['question1'][i])
+  question1=question1.lower()
+  question1=question1.split()
+
+  ps = PorterStemmer()
+  question1 = [ps.stem(word) for word in question1 if not word in set (stopwords.words('english'))]
+  question1=' '.join(question1)
+    
+    
+  question2= re.sub('[^a-zA-Z]',' ',train_df['question2'][i])
+  question2=question2.lower()
+  question2 = question2.split()
+  ps = PorterStemmer()
+  question2= [ps.stem(word) for word in question2 if not word in set(stopwords.words('english'))]
+  question2=' '.join(question2)
+    
+  corpus.append(question1)
+  corpus.append(question2)
+  print(corpus)
+
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+vectorizer = CountVectorizer()
+vectorizer.fit(corpus)
+vector = vectorizer.transform(corpus)
+print(vector.shape)
+a=vector.toarray()
+print (a)
+print (vectorizer.vocabulary_)
+
+
+from sklearn.metrics.pairwise import cosine_similarity
+for j in range (0 , 44 ,2):
+ print(cosine_similarity([a[j],a[j+1]]))
+
+
